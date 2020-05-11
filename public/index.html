@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>C21 workshop</title>
+</head>
+<body>
+    <button type="submit" onclick="getUser()">get user</button><br>
+    <h1 id="name"></h1><br>
+    <h1 id="gender"></h1><br>
+    <button onclick="removeUser()">remove user</button><br>
+    
+    <hr style="border: 2px solid#5b9aa0;" />
+    
+    name: <input type="text" id="username">
+    gender: <input type="text" id="sex">
+    age: <input type="text" id="age"><br>
+    <button type="submit" onclick="postForm()"style="font-size: larger; width: 100px; margin-top: 0.5cm; ">
+        Submit Data
+    </button>
+    <br>
+    <p id="err"></p>
+    <script>
+        const removeUser = () => {
+            if(document.getElementById("name").innerHTML){
+                document.getElementById("name").innerHTML ="";
+                document.getElementById("gender").innerHTML ="";
+                console.log("user removed from webpage...")
+            }
+        };
+
+        const getUserInput = () => {
+            console.log("Getting user input from webpage...")
+            let userObj = {}
+            let elements = document.getElementsByTagName("INPUT")
+            if(elements.length == 3){
+                for(const elem of elements){
+                    if(!elem.value) throw "Form cannot be empty"
+                    userObj[elem.id] = elem.value
+                }
+                return userObj
+            }
+        };
+
+        const getUser = async () => {
+            console.log("Getting users from server...")
+            try {
+                let user = await fetch("http://127.0.0.1:3006/getuser")
+                let obj = await user.json()
+
+                document.getElementById("name").innerHTML = obj.name
+                document.getElementById("gender").innerHTML = obj.gender
+                console.log("All is well on the server...")
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const postForm = async () => {
+            console.log("Posting user info to server...")
+            try {
+                let data = getUserInput()
+                let query  = await fetch("http://127.0.0.1:3006/postdata", {
+                    method: "post",
+                    headers: {
+                        'Content-type': 'application/json' 
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                let res = await query.json();
+                console.log(res);
+
+            } catch (err) {
+              console.log(err);  
+            }
+
+        }
+    </script>
+</body>
+</html>
